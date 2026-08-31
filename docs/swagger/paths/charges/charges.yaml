@@ -1,0 +1,68 @@
+post:
+  tags: [Charges]
+  summary: Add charge to group
+  operationId: createCharge
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/create_charge_request.yaml
+  responses:
+    "201":
+      description: Charge created
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  code:
+                    example: 201
+                  data:
+                    $ref: ../../components/schemas/charge.yaml
+    "400":
+      $ref: ../../components/responses/error.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml
+get:
+  tags: [Charges]
+  summary: List charges in group
+  operationId: listCharges
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+    - name: paidBy
+      in: query
+      schema:
+        type: integer
+    - name: minAmount
+      in: query
+      schema:
+        type: number
+    - name: maxAmount
+      in: query
+      schema:
+        type: number
+    - name: q
+      in: query
+      schema:
+        type: string
+  responses:
+    "200":
+      description: Charge list
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ../../components/schemas/charge.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml

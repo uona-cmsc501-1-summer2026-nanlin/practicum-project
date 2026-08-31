@@ -1,0 +1,22 @@
+delete:
+  tags: [Internal (testing)]
+  summary: Truncate all data
+  description: >
+    **Internal testing only — not for production.** Deletes every charge, person,
+    and group, then resets auto-increment counters. Will be removed in a future release.
+  operationId: truncateAll
+  deprecated: true
+  responses:
+    "200":
+      description: All data truncated
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    $ref: ../../components/schemas/truncate_response.yaml
+    "500":
+      $ref: ../../components/responses/error.yaml

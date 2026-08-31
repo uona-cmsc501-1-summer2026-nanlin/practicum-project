@@ -1,0 +1,26 @@
+post:
+  tags: [Settle]
+  summary: Compute settlement for a group
+  operationId: settleGroup
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+  requestBody:
+    required: false
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/settle_request.yaml
+  responses:
+    "200":
+      description: Settlement result
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    $ref: ../../components/schemas/settle_response.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml

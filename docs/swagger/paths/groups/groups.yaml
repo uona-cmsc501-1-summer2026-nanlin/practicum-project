@@ -1,0 +1,49 @@
+post:
+  tags: [Groups]
+  summary: Create a group
+  operationId: createGroup
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/create_group_request.yaml
+  responses:
+    "201":
+      description: Group created
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  code:
+                    example: 201
+                  data:
+                    $ref: ../../components/schemas/group.yaml
+    "400":
+      $ref: ../../components/responses/error.yaml
+get:
+  tags: [Groups]
+  summary: List groups
+  operationId: listGroups
+  parameters:
+    - name: name
+      in: query
+      schema:
+        type: string
+  responses:
+    "200":
+      description: Group list
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ../../components/schemas/group.yaml

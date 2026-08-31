@@ -1,0 +1,20 @@
+title: ReplyErrorEnvelope
+type: object
+properties:
+  mime_type:
+    type: string
+    example: application/problem+json
+  code:
+    type: integer
+    example: 400
+  status:
+    type: string
+    example: error
+  error:
+    type: array
+    items:
+      type: string
+    example: ["name is required"]
+  message:
+    type: string
+    example: validation failed

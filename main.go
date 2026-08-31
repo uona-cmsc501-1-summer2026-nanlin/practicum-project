@@ -4,11 +4,13 @@ import (
 	"log"
 	"os"
 
+	"github.com/gobeetle/reply"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/uona-cmsc501-1-summer2026-nanlin/practicum-project/internal/database"
 	"github.com/uona-cmsc501-1-summer2026-nanlin/practicum-project/internal/handlers"
+	"github.com/uona-cmsc501-1-summer2026-nanlin/practicum-project/internal/swagger"
 )
 
 func main() {
@@ -23,22 +25,33 @@ func main() {
 	}
 
 	app := fiber.New(fiber.Config{
-		AppName: "Shared Bill Splitter API",
+		AppName:      "Shared Bill Splitter API",
+		ErrorHandler: reply.FiberErrorHandler(),
 	})
 	app.Use(logger.New())
 	app.Use(cors.New())
+
+	swaggerCfg := swagger.DefaultConfig()
+	if v := os.Getenv("SWAGGER_BASE_URL"); v != "" {
+		swaggerCfg.BaseURL = v
+	}
+	if v := os.Getenv("OAS_SPEC_FILE"); v != "" {
+		swaggerCfg.SpecFile = v
+	}
+	swagger.MustMount(app, swaggerCfg)
 
 	api := &handlers.API{DB: db}
 	api.Register(app)
 
 	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{"status": "ok"})
+		return reply.NewFiber(c).JSON(reply.NewData(fiber.Map{"status": "ok"}))
 	})
 
 	addr := os.Getenv("ADDR")
 	if addr == "" {
-		addr = ":3000"
+		addr = ":55555"
 	}
 	log.Printf("listening on http://localhost%s (HTTP only, MVP)", addr)
+	log.Printf("swagger UI: http://localhost%s/swagger", addr)
 	log.Fatal(app.Listen(addr))
 }

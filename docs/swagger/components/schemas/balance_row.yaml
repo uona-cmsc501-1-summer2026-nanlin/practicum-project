@@ -1,0 +1,11 @@
+title: BalanceRow
+type: object
+properties:
+  personId:
+    type: integer
+    format: int64
+  name:
+    type: string
+  net:
+    type: number
+    format: double

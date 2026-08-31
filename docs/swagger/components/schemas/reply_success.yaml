@@ -1,0 +1,19 @@
+title: ReplySuccessEnvelope
+type: object
+properties:
+  mime_type:
+    type: string
+    example: application/json
+  code:
+    type: integer
+    example: 200
+  status:
+    type: string
+    enum: [success, error, processing, pending, failed, other]
+    example: success
+  message:
+    type: string
+    nullable: true
+  data:
+    type: object
+    description: Endpoint-specific payload

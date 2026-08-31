@@ -1,0 +1,23 @@
+delete:
+  tags: [Internal (testing)]
+  summary: Truncate all groups (and related data)
+  description: >
+    **Internal testing only — not for production.** Deletes all charges, people,
+    and groups, then resets auto-increment counters. Same effect as truncate-all
+    for the current schema. Will be removed in a future release.
+  operationId: truncateGroups
+  deprecated: true
+  responses:
+    "200":
+      description: Groups and related data truncated
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    $ref: ../../components/schemas/truncate_response.yaml
+    "500":
+      $ref: ../../components/responses/error.yaml

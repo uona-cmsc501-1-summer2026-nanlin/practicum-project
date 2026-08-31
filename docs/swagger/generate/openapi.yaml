@@ -1,0 +1,708 @@
+openapi: 3.1.0
+info:
+  version: 0.2.0
+  title: Shared Bill Splitter API
+  description: |
+    REST API for splitting shared expenses. See docs/swagger/markdown/app_description.md for workflow details.
+servers:
+  - url: http://localhost:55555
+tags:
+  - name: General
+    description: Health and service info
+  - name: Groups
+    description: Bill-split sessions
+  - name: People
+    description: Members in a group
+  - name: Charges
+    description: Shared expenses
+  - name: Settle
+    description: Net balances and transfers
+  - name: Internal (testing)
+    description: |
+      Dev-only helpers for wiping test data. Not for production — will be deprecated and removed soon.
+paths:
+  /health:
+    get:
+      tags:
+        - General
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            example: ok
+  /api/v1/groups:
+    post:
+      tags:
+        - Groups
+      summary: Create a group
+      operationId: createGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create_group_request'
+      responses:
+        '201':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      code:
+                        example: 201
+                      data:
+                        $ref: '#/components/schemas/group'
+        '400':
+          $ref: '#/components/responses/error'
+    get:
+      tags:
+        - Groups
+      summary: List groups
+      operationId: listGroups
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/group'
+  /api/v1/groups/{groupId}:
+    get:
+      tags:
+        - Groups
+      summary: Get group by id
+      operationId: getGroup
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+      responses:
+        '200':
+          description: Group found
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/group'
+        '404':
+          $ref: '#/components/responses/error'
+    delete:
+      tags:
+        - Groups
+      summary: Delete group
+      operationId: deleteGroup
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+      responses:
+        '204':
+          description: Group deleted
+        '404':
+          $ref: '#/components/responses/error'
+  /api/v1/groups/{groupId}/people:
+    post:
+      tags:
+        - People
+      summary: Add person to group
+      operationId: createPerson
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create_person_request'
+      responses:
+        '201':
+          description: Person created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      code:
+                        example: 201
+                      data:
+                        $ref: '#/components/schemas/person'
+        '400':
+          $ref: '#/components/responses/error'
+        '404':
+          $ref: '#/components/responses/error'
+    get:
+      tags:
+        - People
+      summary: List people in group
+      operationId: listPeople
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+        - name: name
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: People list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/person'
+        '404':
+          $ref: '#/components/responses/error'
+  /api/v1/groups/{groupId}/people/{personId}:
+    get:
+      tags:
+        - People
+      summary: Get person by id
+      operationId: getPerson
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+        - $ref: '#/components/parameters/person_id'
+      responses:
+        '200':
+          description: Person found
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/person'
+        '404':
+          $ref: '#/components/responses/error'
+    delete:
+      tags:
+        - People
+      summary: Delete person
+      operationId: deletePerson
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+        - $ref: '#/components/parameters/person_id'
+      responses:
+        '204':
+          description: Person deleted
+        '404':
+          $ref: '#/components/responses/error'
+  /api/v1/groups/{groupId}/charges:
+    post:
+      tags:
+        - Charges
+      summary: Add charge to group
+      operationId: createCharge
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create_charge_request'
+      responses:
+        '201':
+          description: Charge created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      code:
+                        example: 201
+                      data:
+                        $ref: '#/components/schemas/charge'
+        '400':
+          $ref: '#/components/responses/error'
+        '404':
+          $ref: '#/components/responses/error'
+    get:
+      tags:
+        - Charges
+      summary: List charges in group
+      operationId: listCharges
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+        - name: paidBy
+          in: query
+          schema:
+            type: integer
+        - name: minAmount
+          in: query
+          schema:
+            type: number
+        - name: maxAmount
+          in: query
+          schema:
+            type: number
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Charge list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/charge'
+        '404':
+          $ref: '#/components/responses/error'
+  /api/v1/groups/{groupId}/charges/{chargeId}:
+    get:
+      tags:
+        - Charges
+      summary: Get charge by id
+      operationId: getCharge
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+        - $ref: '#/components/parameters/charge_id'
+      responses:
+        '200':
+          description: Charge found
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/charge'
+        '404':
+          $ref: '#/components/responses/error'
+    delete:
+      tags:
+        - Charges
+      summary: Delete charge
+      operationId: deleteCharge
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+        - $ref: '#/components/parameters/charge_id'
+      responses:
+        '204':
+          description: Charge deleted
+        '404':
+          $ref: '#/components/responses/error'
+  /api/v1/groups/{groupId}/settle:
+    post:
+      tags:
+        - Settle
+      summary: Compute settlement for a group
+      operationId: settleGroup
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/settle_request'
+      responses:
+        '200':
+          description: Settlement result
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/settle_response'
+        '404':
+          $ref: '#/components/responses/error'
+  /api/v1/internal/testing/truncate/charges:
+    delete:
+      tags:
+        - Internal (testing)
+      summary: Truncate all charges
+      description: |
+        **Internal testing only — not for production.** Deletes every row in `charges` and resets the table auto-increment counter. Will be removed in a future release.
+      operationId: truncateCharges
+      deprecated: true
+      responses:
+        '200':
+          description: Charges truncated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/truncate_response'
+        '500':
+          $ref: '#/components/responses/error'
+  /api/v1/internal/testing/truncate/people:
+    delete:
+      tags:
+        - Internal (testing)
+      summary: Truncate all people
+      description: |
+        **Internal testing only — not for production.** Deletes every row in `people` and resets the table auto-increment counter. Charges may reference missing person IDs afterward. Will be removed in a future release.
+      operationId: truncatePeople
+      deprecated: true
+      responses:
+        '200':
+          description: People truncated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/truncate_response'
+        '500':
+          $ref: '#/components/responses/error'
+  /api/v1/internal/testing/truncate/groups:
+    delete:
+      tags:
+        - Internal (testing)
+      summary: Truncate all groups (and related data)
+      description: |
+        **Internal testing only — not for production.** Deletes all charges, people, and groups, then resets auto-increment counters. Same effect as truncate-all for the current schema. Will be removed in a future release.
+      operationId: truncateGroups
+      deprecated: true
+      responses:
+        '200':
+          description: Groups and related data truncated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/truncate_response'
+        '500':
+          $ref: '#/components/responses/error'
+  /api/v1/internal/testing/truncate/all:
+    delete:
+      tags:
+        - Internal (testing)
+      summary: Truncate all data
+      description: |
+        **Internal testing only — not for production.** Deletes every charge, person, and group, then resets auto-increment counters. Will be removed in a future release.
+      operationId: truncateAll
+      deprecated: true
+      responses:
+        '200':
+          description: All data truncated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/truncate_response'
+        '500':
+          $ref: '#/components/responses/error'
+components:
+  schemas:
+    reply_success:
+      title: ReplySuccessEnvelope
+      type: object
+      properties:
+        mime_type:
+          type: string
+          example: application/json
+        code:
+          type: integer
+          example: 200
+        status:
+          type: string
+          enum:
+            - success
+            - error
+            - processing
+            - pending
+            - failed
+            - other
+          example: success
+        message:
+          type: string
+          nullable: true
+        data:
+          type: object
+          description: Endpoint-specific payload
+    group:
+      title: Group
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        currency:
+          type: string
+          example: USD
+        createdAt:
+          type: string
+          format: date-time
+    create_group_request:
+      title: CreateGroupRequest
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        currency:
+          type: string
+          default: USD
+    reply_error:
+      title: ReplyErrorEnvelope
+      type: object
+      properties:
+        mime_type:
+          type: string
+          example: application/problem+json
+        code:
+          type: integer
+          example: 400
+        status:
+          type: string
+          example: error
+        error:
+          type: array
+          items:
+            type: string
+          example:
+            - name is required
+        message:
+          type: string
+          example: validation failed
+    person:
+      title: Person
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        groupId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+    create_person_request:
+      title: CreatePersonRequest
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+    charge:
+      title: ChargeResponse
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        groupId:
+          type: integer
+          format: int64
+        description:
+          type: string
+        amount:
+          type: number
+          format: double
+        paidByPersonId:
+          type: integer
+          format: int64
+        participantIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        splitRule:
+          type: string
+          example: equal
+        sharePerPerson:
+          type: number
+          format: double
+    create_charge_request:
+      title: CreateChargeRequest
+      type: object
+      required:
+        - description
+        - amount
+        - paidByPersonId
+      properties:
+        description:
+          type: string
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+        paidByPersonId:
+          type: integer
+          format: int64
+        participantIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        splitRule:
+          type: string
+          default: equal
+    settle_request:
+      title: SettleRequest
+      type: object
+      properties:
+        onlyChargeIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+    balance_row:
+      title: BalanceRow
+      type: object
+      properties:
+        personId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        net:
+          type: number
+          format: double
+    transfer_row:
+      title: TransferRow
+      type: object
+      properties:
+        fromPersonId:
+          type: integer
+          format: int64
+        fromName:
+          type: string
+        toPersonId:
+          type: integer
+          format: int64
+        toName:
+          type: string
+        amount:
+          type: number
+          format: double
+    settle_response:
+      title: SettleResponse
+      type: object
+      properties:
+        groupId:
+          type: integer
+          format: int64
+        currency:
+          type: string
+        balances:
+          type: array
+          items:
+            $ref: '#/components/schemas/balance_row'
+        transfers:
+          type: array
+          items:
+            $ref: '#/components/schemas/transfer_row'
+    truncate_response:
+      title: TruncateResponse
+      type: object
+      description: Count of rows deleted per table.
+      properties:
+        charges:
+          type: integer
+          format: int64
+          example: 3
+        people:
+          type: integer
+          format: int64
+          example: 0
+        groups:
+          type: integer
+          format: int64
+          example: 0
+  responses:
+    error:
+      description: Client or server error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/reply_error'
+  parameters:
+    group_id:
+      name: groupId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    person_id:
+      name: personId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    charge_id:
+      name: chargeId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64

@@ -1,0 +1,10 @@
+title: CreateGroupRequest
+type: object
+required:
+  - name
+properties:
+  name:
+    type: string
+  currency:
+    type: string
+    default: USD

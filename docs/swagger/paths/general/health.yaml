@@ -1,0 +1,20 @@
+get:
+  tags: [General]
+  summary: Health check
+  operationId: healthCheck
+  responses:
+    "200":
+      description: Service is up
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: ok

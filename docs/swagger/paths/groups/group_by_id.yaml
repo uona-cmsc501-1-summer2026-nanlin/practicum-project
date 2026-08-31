@@ -1,0 +1,31 @@
+get:
+  tags: [Groups]
+  summary: Get group by id
+  operationId: getGroup
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+  responses:
+    "200":
+      description: Group found
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    $ref: ../../components/schemas/group.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml
+delete:
+  tags: [Groups]
+  summary: Delete group
+  operationId: deleteGroup
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+  responses:
+    "204":
+      description: Group deleted
+    "404":
+      $ref: ../../components/responses/error.yaml

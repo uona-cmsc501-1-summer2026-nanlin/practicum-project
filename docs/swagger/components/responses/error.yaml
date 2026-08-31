@@ -1,0 +1,5 @@
+description: Client or server error
+content:
+  application/problem+json:
+    schema:
+      $ref: ../schemas/reply_error.yaml

@@ -1,0 +1,16 @@
+title: TruncateResponse
+type: object
+description: Count of rows deleted per table.
+properties:
+  charges:
+    type: integer
+    format: int64
+    example: 3
+  people:
+    type: integer
+    format: int64
+    example: 0
+  groups:
+    type: integer
+    format: int64
+    example: 0

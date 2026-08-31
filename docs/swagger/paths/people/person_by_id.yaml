@@ -1,0 +1,33 @@
+get:
+  tags: [People]
+  summary: Get person by id
+  operationId: getPerson
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+    - $ref: ../../components/parameters/person_id.yaml
+  responses:
+    "200":
+      description: Person found
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    $ref: ../../components/schemas/person.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml
+delete:
+  tags: [People]
+  summary: Delete person
+  operationId: deletePerson
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+    - $ref: ../../components/parameters/person_id.yaml
+  responses:
+    "204":
+      description: Person deleted
+    "404":
+      $ref: ../../components/responses/error.yaml

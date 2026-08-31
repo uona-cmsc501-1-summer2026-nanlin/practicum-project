@@ -1,0 +1,16 @@
+title: SettleResponse
+type: object
+properties:
+  groupId:
+    type: integer
+    format: int64
+  currency:
+    type: string
+  balances:
+    type: array
+    items:
+      $ref: ./balance_row.yaml
+  transfers:
+    type: array
+    items:
+      $ref: ./transfer_row.yaml

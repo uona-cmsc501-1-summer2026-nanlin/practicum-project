@@ -1,0 +1,33 @@
+get:
+  tags: [Charges]
+  summary: Get charge by id
+  operationId: getCharge
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+    - $ref: ../../components/parameters/charge_id.yaml
+  responses:
+    "200":
+      description: Charge found
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    $ref: ../../components/schemas/charge.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml
+delete:
+  tags: [Charges]
+  summary: Delete charge
+  operationId: deleteCharge
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+    - $ref: ../../components/parameters/charge_id.yaml
+  responses:
+    "204":
+      description: Charge deleted
+    "404":
+      $ref: ../../components/responses/error.yaml

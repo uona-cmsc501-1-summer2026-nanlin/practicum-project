@@ -1,0 +1,49 @@
+openapi: 3.1.0
+info:
+  version: 0.2.0
+  title: Shared Bill Splitter API
+  description: >
+    REST API for splitting shared expenses. See docs/swagger/markdown/app_description.md
+    for workflow details.
+tags:
+  - name: General
+    description: Health and service info
+  - name: Groups
+    description: Bill-split sessions
+  - name: People
+    description: Members in a group
+  - name: Charges
+    description: Shared expenses
+  - name: Settle
+    description: Net balances and transfers
+  - name: Internal (testing)
+    description: >
+      Dev-only helpers for wiping test data. Not for production — will be
+      deprecated and removed soon.
+servers:
+  - url: http://localhost:55555
+paths:
+  /health:
+    $ref: ./paths/general/health.yaml
+  /api/v1/groups:
+    $ref: ./paths/groups/groups.yaml
+  /api/v1/groups/{groupId}:
+    $ref: ./paths/groups/group_by_id.yaml
+  /api/v1/groups/{groupId}/people:
+    $ref: ./paths/people/people.yaml
+  /api/v1/groups/{groupId}/people/{personId}:
+    $ref: ./paths/people/person_by_id.yaml
+  /api/v1/groups/{groupId}/charges:
+    $ref: ./paths/charges/charges.yaml
+  /api/v1/groups/{groupId}/charges/{chargeId}:
+    $ref: ./paths/charges/charge_by_id.yaml
+  /api/v1/groups/{groupId}/settle:
+    $ref: ./paths/settle/settle.yaml
+  /api/v1/internal/testing/truncate/charges:
+    $ref: ./paths/internal/truncate_charges.yaml
+  /api/v1/internal/testing/truncate/people:
+    $ref: ./paths/internal/truncate_people.yaml
+  /api/v1/internal/testing/truncate/groups:
+    $ref: ./paths/internal/truncate_groups.yaml
+  /api/v1/internal/testing/truncate/all:
+    $ref: ./paths/internal/truncate_all.yaml

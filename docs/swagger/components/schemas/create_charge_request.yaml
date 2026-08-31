@@ -1,0 +1,24 @@
+title: CreateChargeRequest
+type: object
+required:
+  - description
+  - amount
+  - paidByPersonId
+properties:
+  description:
+    type: string
+  amount:
+    type: number
+    format: double
+    minimum: 0.01
+  paidByPersonId:
+    type: integer
+    format: int64
+  participantIds:
+    type: array
+    items:
+      type: integer
+      format: int64
+  splitRule:
+    type: string
+    default: equal

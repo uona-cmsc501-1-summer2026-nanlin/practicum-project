@@ -68,7 +68,7 @@ Fiber is designed for fast development with performance in mind: Express-inspire
 
 ### API design (endpoints, params, bodies)
 
-Base URL (local MVP): `http://localhost:3000/api/v1`  
+Base URL (local MVP): `http://localhost:55555/api/v1`  
 (HTTP only for MVP; no TLS/certs in this project plan)
 
 **Coming milestones:** We will publish an **OpenAPI Specification 3 (OAS 3) / Swagger** document for these endpoints so Postman import, client generation, and (later) UI work stay aligned with a single contract. Deliverable #1 defines the design; the formal OAS 3/Swagger file lands in a later milestone.

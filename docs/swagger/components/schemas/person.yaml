@@ -1,0 +1,13 @@
+title: Person
+type: object
+properties:
+  id:
+    type: integer
+    format: int64
+  groupId:
+    type: integer
+    format: int64
+  name:
+    type: string
+  email:
+    type: string

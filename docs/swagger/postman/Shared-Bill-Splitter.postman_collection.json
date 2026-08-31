@@ -1,0 +1,596 @@
+{
+  "info": {
+    "_postman_id": "billsplitter-d2-2026",
+    "name": "Shared Bill Splitter API (D2)",
+    "description": "CMSC501-1 practicum — Deliverable #2 demo collection.\n\n**Setup:** run `go run .` from practicum-project, then import this file into Postman.\n\n**Tip:** run folder **1. Valid Demo Flow** top to bottom — it saves `groupId`, person ids, and `chargeId` into collection variables for later requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:55555/api/v1"
+    },
+    {
+      "key": "host",
+      "value": "http://localhost:55555"
+    },
+    {
+      "key": "groupId",
+      "value": "1"
+    },
+    {
+      "key": "personId1",
+      "value": "1"
+    },
+    {
+      "key": "personId2",
+      "value": "2"
+    },
+    {
+      "key": "personId3",
+      "value": "3"
+    },
+    {
+      "key": "chargeId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{host}}/health",
+            "description": "Quick check that the server is running."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "1. Valid Demo Flow",
+      "description": "Run these requests **in order**. Each create step saves ids into collection variables.",
+      "item": [
+        {
+          "name": "Create group",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.collectionVariables.set('groupId', String(data.id));",
+                  "pm.test('Group has name', () => pm.expect(data.name).to.eql('July beach trip'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"July beach trip\",\n  \"currency\": \"USD\"\n}"
+            },
+            "url": "{{baseUrl}}/groups",
+            "description": "Creates a new group. Saves `groupId` to collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Add person — Alex",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.collectionVariables.set('personId1', String(data.id));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alex\",\n  \"email\": \"alex@example.com\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/people"
+          },
+          "response": []
+        },
+        {
+          "name": "Add person — Sam",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.collectionVariables.set('personId2', String(data.id));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sam\",\n  \"email\": \"sam@example.com\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/people"
+          },
+          "response": []
+        },
+        {
+          "name": "Add person — Jordan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.collectionVariables.set('personId3', String(data.id));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jordan\",\n  \"email\": \"jordan@example.com\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/people"
+          },
+          "response": []
+        },
+        {
+          "name": "Add charge — Dinner $90",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.collectionVariables.set('chargeId', String(data.id));",
+                  "pm.test('Share is $30', () => pm.expect(data.sharePerPerson).to.eql(30));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Dinner\",\n  \"amount\": 90,\n  \"paidByPersonId\": {{personId1}},\n  \"participantIds\": [{{personId1}}, {{personId2}}, {{personId3}}],\n  \"splitRule\": \"equal\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/charges",
+            "description": "Alex paid $90; split equally among all three → $30 each."
+          },
+          "response": []
+        },
+        {
+          "name": "Settle",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.test('Alex net +60', () => {",
+                  "  const alex = data.balances.find(b => b.name === 'Alex');",
+                  "  pm.expect(alex.net).to.eql(60);",
+                  "});",
+                  "pm.test('Two transfers', () => pm.expect(data.transfers).to.have.lengthOf(2));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/settle",
+            "description": "Expected: Alex +60, Sam -30, Jordan -30. Transfers: Sam→Alex $30, Jordan→Alex $30."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter charges (minAmount=50)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/{{groupId}}/charges?minAmount=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["groups", "{{groupId}}", "charges"],
+              "query": [
+                {
+                  "key": "minAmount",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Returns charges with amount >= 50 (the Dinner charge)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Invalid Inputs",
+      "description": "Bad requests — server returns JSON error and keeps running.",
+      "item": [
+        {
+          "name": "Empty group name (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "const body = pm.response.json();",
+                  "pm.test('Reply code is 400', () => pm.expect(body.code).to.eql(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\"\n}"
+            },
+            "url": "{{baseUrl}}/groups"
+          },
+          "response": []
+        },
+        {
+          "name": "Empty person name (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/people"
+          },
+          "response": []
+        },
+        {
+          "name": "Charge amount zero (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "const body = pm.response.json();",
+                  "pm.test('Reply code is 400', () => pm.expect(body.code).to.eql(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Bad charge\",\n  \"amount\": 0,\n  \"paidByPersonId\": {{personId1}},\n  \"participantIds\": [{{personId1}}]\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/charges"
+          },
+          "response": []
+        },
+        {
+          "name": "Payer not in group (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));",
+                  "const body = pm.response.json();",
+                  "pm.test('Reply code is 404', () => pm.expect(body.code).to.eql(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Bad charge\",\n  \"amount\": 10,\n  \"paidByPersonId\": 999,\n  \"participantIds\": [{{personId1}}]\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/charges"
+          },
+          "response": []
+        },
+        {
+          "name": "Unknown group — add person (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nobody\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/999/people"
+          },
+          "response": []
+        },
+        {
+          "name": "Settle missing group (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{baseUrl}}/groups/999/settle"
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid JSON body (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "const body = pm.response.json();",
+                  "pm.test('Reply code is 400', () => pm.expect(body.code).to.eql(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ not valid json"
+            },
+            "url": "{{baseUrl}}/groups"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. CRUD (optional)",
+      "description": "Extra endpoints for exploring the API.",
+      "item": [
+        {
+          "name": "List groups",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups?name=July",
+              "host": ["{{baseUrl}}"],
+              "path": ["groups"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "July"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get group by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/groups/{{groupId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "List people",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/groups/{{groupId}}/people"
+          },
+          "response": []
+        },
+        {
+          "name": "Get person by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/groups/{{groupId}}/people/{{personId1}}"
+          },
+          "response": []
+        },
+        {
+          "name": "List charges",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/groups/{{groupId}}/charges"
+          },
+          "response": []
+        },
+        {
+          "name": "Get charge by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/groups/{{groupId}}/charges/{{chargeId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete charge",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/groups/{{groupId}}/charges/{{chargeId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete person",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/groups/{{groupId}}/people/{{personId3}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete group",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/groups/{{groupId}}"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

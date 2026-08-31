@@ -1,0 +1,56 @@
+post:
+  tags: [People]
+  summary: Add person to group
+  operationId: createPerson
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/create_person_request.yaml
+  responses:
+    "201":
+      description: Person created
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  code:
+                    example: 201
+                  data:
+                    $ref: ../../components/schemas/person.yaml
+    "400":
+      $ref: ../../components/responses/error.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml
+get:
+  tags: [People]
+  summary: List people in group
+  operationId: listPeople
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+    - name: name
+      in: query
+      schema:
+        type: string
+  responses:
+    "200":
+      description: People list
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ../../components/schemas/person.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml

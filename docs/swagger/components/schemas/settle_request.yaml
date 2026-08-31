@@ -1,0 +1,8 @@
+title: SettleRequest
+type: object
+properties:
+  onlyChargeIds:
+    type: array
+    items:
+      type: integer
+      format: int64

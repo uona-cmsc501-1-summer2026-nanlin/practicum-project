@@ -1,0 +1,16 @@
+title: TransferRow
+type: object
+properties:
+  fromPersonId:
+    type: integer
+    format: int64
+  fromName:
+    type: string
+  toPersonId:
+    type: integer
+    format: int64
+  toName:
+    type: string
+  amount:
+    type: number
+    format: double

@@ -1,0 +1,28 @@
+title: ChargeResponse
+type: object
+properties:
+  id:
+    type: integer
+    format: int64
+  groupId:
+    type: integer
+    format: int64
+  description:
+    type: string
+  amount:
+    type: number
+    format: double
+  paidByPersonId:
+    type: integer
+    format: int64
+  participantIds:
+    type: array
+    items:
+      type: integer
+      format: int64
+  splitRule:
+    type: string
+    example: equal
+  sharePerPerson:
+    type: number
+    format: double
