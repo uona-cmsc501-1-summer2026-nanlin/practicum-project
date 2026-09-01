@@ -53,6 +53,10 @@ flowchart TD
     Settle --> JSON[balances + transfers JSON]
 ```
 
+### REST API input / output flow
+
+See [project-2-doc.md](project-2-doc.md) for dependencies, Swagger URLs, sequence diagrams, database schema, and the demo sequence.
+
 ### What each package / type is designed to do
 
 #### `main`

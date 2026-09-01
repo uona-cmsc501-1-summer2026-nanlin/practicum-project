@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "billsplitter-d2-2026",
     "name": "Shared Bill Splitter API (D2)",
-    "description": "CMSC501-1 practicum — Deliverable #2 demo collection.\n\n**Setup:** run `go run .` from practicum-project, then import this file into Postman.\n\n**Tip:** run folder **1. Valid Demo Flow** top to bottom — it saves `groupId`, person ids, and `chargeId` into collection variables for later requests.",
+    "description": "CMSC501-1 practicum — Deliverable #2 demo collection.\n\n**Setup:** run `go run .` from practicum-project (or `make run`), then import this file into Postman.\n\n**Collection variables (initial values for a fresh DB):**\n| Variable | Initial | Set by |\n|----------|---------|--------|\n| `groupId` | 1 | Create group |\n| `personId1` … `personId5` | 1 … 5 | Add person requests |\n| `chargeId` … `chargeId4` | 1 … 4 | Add charge requests |\n\n**Tip:** run folder **1. Valid Demo Flow** top to bottom — each create step overwrites ids from the API response so later requests stay in sync.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -31,8 +31,28 @@
       "value": "3"
     },
     {
+      "key": "personId4",
+      "value": "4"
+    },
+    {
+      "key": "personId5",
+      "value": "5"
+    },
+    {
       "key": "chargeId",
       "value": "1"
+    },
+    {
+      "key": "chargeId2",
+      "value": "2"
+    },
+    {
+      "key": "chargeId3",
+      "value": "3"
+    },
+    {
+      "key": "chargeId4",
+      "value": "4"
     }
   ],
   "item": [
@@ -53,7 +73,7 @@
     },
     {
       "name": "1. Valid Demo Flow",
-      "description": "Run these requests **in order**. Each create step saves ids into collection variables.",
+      "description": "Run these requests **in order**. Five people, four charges (some split among only a subset). Each create step saves ids into collection variables.",
       "item": [
         {
           "name": "Create group",
@@ -186,7 +206,7 @@
           "response": []
         },
         {
-          "name": "Add charge — Dinner $90",
+          "name": "Add person — Riley",
           "event": [
             {
               "listen": "test",
@@ -195,8 +215,7 @@
                   "pm.test('Status is 201', () => pm.response.to.have.status(201));",
                   "const body = pm.response.json();",
                   "const data = body.data || body;",
-                  "pm.collectionVariables.set('chargeId', String(data.id));",
-                  "pm.test('Share is $30', () => pm.expect(data.sharePerPerson).to.eql(30));"
+                  "pm.collectionVariables.set('personId4', String(data.id));"
                 ],
                 "type": "text/javascript"
               }
@@ -212,10 +231,201 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"description\": \"Dinner\",\n  \"amount\": 90,\n  \"paidByPersonId\": {{personId1}},\n  \"participantIds\": [{{personId1}}, {{personId2}}, {{personId3}}],\n  \"splitRule\": \"equal\"\n}"
+              "raw": "{\n  \"name\": \"Riley\",\n  \"email\": \"riley@example.com\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/people"
+          },
+          "response": []
+        },
+        {
+          "name": "Add person — Casey",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.collectionVariables.set('personId5', String(data.id));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Casey\",\n  \"email\": \"casey@example.com\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/people"
+          },
+          "response": []
+        },
+        {
+          "name": "Add charge — Dinner $90 (all 5)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.collectionVariables.set('chargeId', String(data.id));",
+                  "pm.test('Share is $18', () => pm.expect(data.sharePerPerson).to.eql(18));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Dinner\",\n  \"amount\": 90,\n  \"paidByPersonId\": {{personId1}},\n  \"participantIds\": [{{personId1}}, {{personId2}}, {{personId3}}, {{personId4}}, {{personId5}}],\n  \"splitRule\": \"equal\"\n}"
             },
             "url": "{{baseUrl}}/groups/{{groupId}}/charges",
-            "description": "Alex paid $90; split equally among all three → $30 each."
+            "description": "Alex paid $90; split equally among all five → $18 each."
+          },
+          "response": []
+        },
+        {
+          "name": "Add charge — Groceries $60 (Alex, Sam, Jordan)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.collectionVariables.set('chargeId2', String(data.id));",
+                  "pm.test('Share is $20', () => pm.expect(data.sharePerPerson).to.eql(20));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Groceries\",\n  \"amount\": 60,\n  \"paidByPersonId\": {{personId2}},\n  \"participantIds\": [{{personId1}}, {{personId2}}, {{personId3}}],\n  \"splitRule\": \"equal\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/charges",
+            "description": "Sam paid $60; split only among Alex, Sam, and Jordan → $20 each. Riley and Casey not included."
+          },
+          "response": []
+        },
+        {
+          "name": "Add charge — Uber $40 (Sam, Casey)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.collectionVariables.set('chargeId3', String(data.id));",
+                  "pm.test('Share is $20', () => pm.expect(data.sharePerPerson).to.eql(20));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Uber\",\n  \"amount\": 40,\n  \"paidByPersonId\": {{personId5}},\n  \"participantIds\": [{{personId2}}, {{personId5}}],\n  \"splitRule\": \"equal\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/charges",
+            "description": "Casey paid $40; split only between Sam and Casey → $20 each."
+          },
+          "response": []
+        },
+        {
+          "name": "Add charge — Camping gear $75 (Jordan, Riley, Casey)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.collectionVariables.set('chargeId4', String(data.id));",
+                  "pm.test('Share is $25', () => pm.expect(data.sharePerPerson).to.eql(25));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Camping gear\",\n  \"amount\": 75,\n  \"paidByPersonId\": {{personId3}},\n  \"participantIds\": [{{personId3}}, {{personId4}}, {{personId5}}],\n  \"splitRule\": \"equal\"\n}"
+            },
+            "url": "{{baseUrl}}/groups/{{groupId}}/charges",
+            "description": "Jordan paid $75; split among Jordan, Riley, and Casey → $25 each. Alex and Sam not included."
+          },
+          "response": []
+        },
+        {
+          "name": "List all charges",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.test('Four charges', () => pm.expect(data).to.have.lengthOf(4));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/groups/{{groupId}}/charges",
+            "description": "Shows all four charges before settling."
           },
           "response": []
         },
@@ -229,11 +439,16 @@
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "const body = pm.response.json();",
                   "const data = body.data || body;",
-                  "pm.test('Alex net +60', () => {",
+                  "pm.test('Five balances', () => pm.expect(data.balances).to.have.lengthOf(5));",
+                  "pm.test('Alex net +52', () => {",
                   "  const alex = data.balances.find(b => b.name === 'Alex');",
-                  "  pm.expect(alex.net).to.eql(60);",
+                  "  pm.expect(alex.net).to.eql(52);",
                   "});",
-                  "pm.test('Two transfers', () => pm.expect(data.transfers).to.have.lengthOf(2));"
+                  "pm.test('Riley net -43', () => {",
+                  "  const riley = data.balances.find(b => b.name === 'Riley');",
+                  "  pm.expect(riley.net).to.eql(-43);",
+                  "});",
+                  "pm.test('Four transfers', () => pm.expect(data.transfers).to.have.lengthOf(4));"
                 ],
                 "type": "text/javascript"
               }
@@ -252,12 +467,26 @@
               "raw": "{}"
             },
             "url": "{{baseUrl}}/groups/{{groupId}}/settle",
-            "description": "Expected: Alex +60, Sam -30, Jordan -30. Transfers: Sam→Alex $30, Jordan→Alex $30."
+            "description": "Expected balances: Alex +52, Sam +2, Jordan +12, Riley -43, Casey -23.\nTransfers: Riley→Alex $43, Casey→Alex $9, Casey→Sam $2, Casey→Jordan $12."
           },
           "response": []
         },
         {
           "name": "Filter charges (minAmount=50)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "const data = body.data || body;",
+                  "pm.test('Three charges >= 50', () => pm.expect(data).to.have.lengthOf(3));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -272,7 +501,7 @@
                 }
               ]
             },
-            "description": "Returns charges with amount >= 50 (the Dinner charge)."
+            "description": "Returns Dinner ($90), Groceries ($60), and Camping gear ($75). Uber ($40) is excluded."
           },
           "response": []
         }
@@ -577,7 +806,7 @@
           "request": {
             "method": "DELETE",
             "header": [],
-            "url": "{{baseUrl}}/groups/{{groupId}}/people/{{personId3}}"
+            "url": "{{baseUrl}}/groups/{{groupId}}/people/{{personId5}}"
           },
           "response": []
         },
