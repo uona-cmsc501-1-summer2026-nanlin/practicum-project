@@ -1,0 +1,18 @@
+get:
+  tags: [General]
+  summary: List allowed currencies
+  operationId: listCurrencies
+  responses:
+    "200":
+      description: Currency options (code, name, flag)
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: ../../components/schemas/currency_option.yaml

@@ -2,9 +2,9 @@ delete:
   tags: [Internal (testing)]
   summary: Truncate all groups (and related data)
   description: >
-    **Internal testing only — not for production.** Deletes all charges, people,
-    and groups, then resets auto-increment counters. Same effect as truncate-all
-    for the current schema. Will be removed in a future release.
+    **Internal testing only — not for production.** Deletes all charges, members,
+    people (users), and groups, then resets auto-increment counters. Same effect
+    as truncate-all for the current schema. Will be removed in a future release.
   operationId: truncateGroups
   deprecated: true
   responses:

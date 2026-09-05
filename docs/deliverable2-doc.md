@@ -1,18 +1,21 @@
-# deliverable2
+# deliverable2 / API companion
 
 **Repository:** https://github.com/uona-cmsc501-1-summer2026-nanlin/practicum-project
 
 **Shared Bill Splitter** — how a client interacts with the REST API.
 
-Base URL: `http://localhost:55555/api/v1`
+Base URL: `http://localhost:55555/api/v1`  
+UI: `http://localhost:55555/app/`
 
-The client (Postman, `curl`, or future UI) sends **JSON input** over HTTP. The API validates the request, reads/writes SQLite, and returns **JSON output** in a standard envelope (`success` + `data`, or `error` + status code).
+The client (Postman, `curl`, or the minimal UI) sends **JSON input** over HTTP. The API validates the request, reads/writes SQLite, and returns **JSON output** in a standard envelope (`success` + `data`, or `error` + status code).
 
 ---
 
 ## Database schema
 
 SQLite database (`billsplitter.db`) managed by GORM AutoMigrate.
+
+After upgrading from Deliverable #2, **delete `billsplitter.db`** so AutoMigrate creates the new tables cleanly.
 
 ```mermaid
 ---
@@ -21,9 +24,21 @@ config:
   theme: neutral
 ---
 erDiagram
-    groups ||--o{ people : "has"
+    users ||--o{ group_members : "joins"
+    groups ||--o{ group_members : "has"
     groups ||--o{ charges : "has"
-    people ||--o{ charges : "paid_by"
+    users ||--o{ charges : "paid_by"
+
+    users {
+        integer id PK
+        text name "NOT NULL"
+        text email
+    }
+
+    group_members {
+        integer group_id FK
+        integer user_id FK
+    }
 
     groups {
         integer id PK
@@ -32,20 +47,13 @@ erDiagram
         datetime created_at
     }
 
-    people {
-        integer id PK
-        integer group_id FK "NOT NULL, indexed"
-        text name "NOT NULL"
-        text email
-    }
-
     charges {
         integer id PK
         integer group_id FK "NOT NULL, indexed"
         text description "NOT NULL"
         real amount "NOT NULL"
-        integer paid_by_person_id FK "NOT NULL"
-        text participant_ids "NOT NULL, JSON array of person IDs"
+        integer paid_by_user_id FK "NOT NULL"
+        text participant_ids "NOT NULL, JSON array of user IDs"
         text split_rule "NOT NULL, default equal"
     }
 ```
@@ -54,16 +62,18 @@ erDiagram
 
 | From | To | Cardinality | How |
 |------|----|-------------|-----|
-| `groups` | `people` | 1 : N | `people.group_id` → `groups.id` |
+| `users` | `group_members` | 1 : N | `group_members.user_id` → `users.id` |
+| `groups` | `group_members` | 1 : N | `group_members.group_id` → `groups.id` |
 | `groups` | `charges` | 1 : N | `charges.group_id` → `groups.id` |
-| `people` | `charges` | 1 : N (payer) | `charges.paid_by_person_id` → `people.id` |
-| `people` | `charges` | N : M (participants) | `charges.participant_ids` stores a JSON array of person IDs (no join table) |
+| `users` | `charges` | 1 : N (payer) | `charges.paid_by_user_id` → `users.id` |
+| `users` | `charges` | N : M (participants) | `charges.participant_ids` stores a JSON array of user IDs |
 
 ### Notes
 
-- **Three tables** — `groups`, `people`, `charges` — no separate settlement or transfer tables; settle results are computed on read.
-- **Participants** are stored as JSON text on each charge, not as foreign-key rows. The API exposes them as `participantIds` in JSON responses.
-- **Indexes** exist on `people.group_id` and `charges.group_id` for listing people/charges within a group.
+- **Four tables** — `users`, `group_members`, `groups`, `charges` — settle results are computed on read.
+- **People are global** — one `users` row can join many groups via `group_members`.
+- **Participants** are stored as JSON text on each charge. The API exposes them as `participantIds`.
+- Payer and participants on a charge must already be **members** of that group.
 
 ---
 
@@ -81,11 +91,6 @@ require (
 )
 ```
 
-- **fiber/v2** — HTTP server, routes, and middleware
-- **gobeetle/reply** — JSON success/error response envelope
-- **gorm** + **driver/sqlite** — ORM and SQLite database access
-- **libopenapi** — serves Swagger UI and the live OpenAPI spec
-
 ---
 
 ## Swagger / OpenAPI
@@ -94,135 +99,83 @@ With the server running (`go run .`):
 
 | Resource | URL |
 |----------|-----|
+| **App UI** | http://localhost:55555/app/ |
 | **Swagger UI** | http://localhost:55555/swagger |
 | **OpenAPI spec (JSON)** | http://localhost:55555/swagger/specification |
 
-Source spec: `docs/swagger/` (merged file: `docs/swagger/generate/openapi.yaml`). Regenerate with `make oas`. Postman collection: `docs/swagger/postman/Shared-Bill-Splitter.postman_collection.json`.
+Source spec: `docs/swagger/` (merged file: `docs/swagger/generate/openapi.yaml`). Regenerate with `make oas`.
 
 ---
 
 ## Sequence diagrams
 
-### 1. Add group
+### 1. Create person (global)
 
 ```mermaid
----
-config:
-  look: handDrawn
-  theme: neutral
----
 sequenceDiagram
-    participant Client as Client (Postman / curl / UI)
-    participant API as REST API — CreateGroup
-    participant DB as SQLite (GORM)
+    participant Client as Client
+    participant API as CreatePerson
+    participant DB as SQLite
 
-    Client->>API: POST /groups<br/>{ name, currency? }
-    API->>API: Parse JSON, validate name
-    alt invalid body or missing name
-        API-->>Client: 400 problem+json
+    Client->>API: POST /people<br/>{ name, email? }
+    API->>API: Validate name
+    alt invalid
+        API-->>Client: 400
     else valid
-        API->>DB: INSERT group (default currency USD)
-        DB-->>API: group id
-        API-->>Client: 201 { success, data: { id, name, currency } }
+        API->>DB: INSERT users
+        API-->>Client: 201 person
     end
 ```
 
-### 2. Add people
+### 2. Create group and add members
 
 ```mermaid
----
-config:
-  look: handDrawn
-  theme: neutral
----
 sequenceDiagram
-    participant Client as Client (Postman / curl / UI)
-    participant API as REST API — CreatePerson
-    participant DB as SQLite (GORM)
+    participant Client as Client
+    participant API as API
+    participant DB as SQLite
 
-    Client->>API: POST /groups/:groupId/people<br/>{ name, email? }
-    API->>API: Parse groupId, validate name
-    API->>DB: SELECT group by id
-    alt group not found
-        API-->>Client: 404 problem+json
-    else invalid body or missing name
-        API-->>Client: 400 problem+json
-    else valid
-        API->>DB: INSERT person (groupId, name, email)
-        DB-->>API: person id
-        API-->>Client: 201 { success, data: { id, groupId, name, email } }
-    end
+    Client->>API: POST /groups { name, currency? }
+    API->>DB: INSERT groups
+    API-->>Client: 201 group
+    Client->>API: POST /groups/:id/members { userId }
+    API->>DB: INSERT group_members
+    API-->>Client: 201 person
 ```
 
-Repeat for each person in the group (Alex, Sam, Jordan, …).
-
-### 3. Add charge (repeat for each transaction)
+### 3. Add charge
 
 ```mermaid
----
-config:
-  look: handDrawn
-  theme: neutral
----
 sequenceDiagram
-    participant Client as Client (Postman / curl / UI)
-    participant API as REST API — CreateCharge
-    participant DB as SQLite (GORM)
+    participant Client as Client
+    participant API as CreateCharge
+    participant DB as SQLite
 
-    Client->>API: POST /groups/:groupId/charges<br/>{ description, amount, paidByPersonId, participantIds?, splitRule? }
-    API->>API: Parse groupId, validate amount & description
-    API->>DB: SELECT group by id
-    alt group not found
-        API-->>Client: 404 problem+json
-    else payer or participant not in group
-        API-->>Client: 404 problem+json
-    else invalid amount or splitRule
-        API-->>Client: 400 problem+json
+    Client->>API: POST /groups/:id/charges<br/>{ description, amount, paidByUserId, participantIds? }
+    API->>DB: Verify payer and participants are members
+    alt not a member
+        API-->>Client: 404
     else valid
-        opt participantIds omitted
-            API->>DB: SELECT all people in group
-            DB-->>API: participant ids
-        end
         API->>DB: INSERT charge
-        DB-->>API: charge id
-        API->>API: Compute sharePerPerson (amount ÷ n)
-        API-->>Client: 201 { success, data: charge + sharePerPerson }
+        API-->>Client: 201 charge + sharePerPerson
     end
 ```
-
-Loop: call again for Dinner, Groceries, Gas, … until all shared expenses are recorded.
 
 ### 4. Settle
 
 ```mermaid
----
-config:
-  look: handDrawn
-  theme: neutral
----
 sequenceDiagram
-    participant Client as Client (Postman / curl / UI)
-    participant API as REST API — Settle
-    participant DB as SQLite (GORM)
+    participant Client as Client
+    participant API as Settle
+    participant DB as SQLite
     participant Settle as settle.Compute
 
-    Client->>API: POST /groups/:groupId/settle<br/>{ onlyChargeIds? }
-    API->>API: Parse groupId, optional body
-    API->>DB: SELECT group by id
-    alt group not found
-        API-->>Client: 404 problem+json
-    else valid
-        API->>DB: SELECT people in group
-        DB-->>API: people[]
-        API->>DB: SELECT charges (all or onlyChargeIds)
-        DB-->>API: charges[]
-        API->>Settle: Compute(group, people, charges, participants)
-        Settle-->>API: balances[] + transfers[]
-        API-->>Client: 200 { success, data: { groupId, currency, balances, transfers } }
-    end
+    Client->>API: POST /groups/:id/settle
+    API->>DB: Load members as users + charges
+    API->>Settle: Compute
+    Settle-->>API: balances + transfers
+    API-->>Client: 200
 ```
-
-Invalid requests at any step return `400` (validation) or `404` (not found) with `application/problem+json`.
 
 ---
 
@@ -230,26 +183,10 @@ Invalid requests at any step return `400` (validation) or `404` (not found) with
 
 | Step | Input (HTTP) | Output |
 |------|--------------|--------|
-| 1 | `POST /groups` — `{ "name", "currency" }` | `201` — group `id` |
-| 2 | `POST /groups/:id/people` — `{ "name", "email" }` | `201` — person `id` |
-| 3 | `POST /groups/:id/charges` — amount, payer, participants | `201` — charge + `sharePerPerson` |
-| 4 | `POST /groups/:id/settle` — optional `onlyChargeIds` | `200` — `balances` + `transfers` |
+| 1 | `POST /people` — `{ "name", "email" }` | `201` — person `id` |
+| 2 | `POST /groups` — `{ "name", "currency" }` | `201` — group `id` |
+| 3 | `POST /groups/:id/members` — `{ "userId" }` | `201` — person |
+| 4 | `POST /groups/:id/charges` — amount, payer, participants | `201` — charge + `sharePerPerson` |
+| 5 | `POST /groups/:id/settle` | `200` — `balances` + `transfers` |
 
-Invalid requests return `400` (validation) or `404` (not found) with `application/problem+json`.
-
-See [deliverable2.md](deliverable2.md) for sample request/response bodies.
-
----
-
-## To-do (final deliverable)
-
-Goal: **global people** (reuse one person across groups) + **minimal UI**. Details: [deliverable3.md](deliverable3.md).
-
-- [ ] Refactor DB — `users` + `group_members`; migrate charges; drop `people`
-- [ ] Global people API — `POST/GET/DELETE /api/v1/people`
-- [ ] Group membership API — add/list/remove members on a group
-- [ ] Update charges, settle, Swagger, and Postman
-- [ ] Add more unit tests — handlers, settle edge cases, and integration/demo coverage
-- [ ] Minimal web UI — People page, Groups page, Group detail (members, charges, settle)
-
-Optional later: edit records, charge edit/delete in UI, search, dark mode.
+See [deliverable3.md](deliverable3.md) for the final deliverable plan and UI scope.

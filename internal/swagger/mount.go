@@ -28,7 +28,7 @@ func DefaultConfig() Config {
 		SpecFile:     "docs/swagger/generate/openapi.yaml",
 		MarkdownFile: "docs/swagger/markdown/app_description.md",
 		BaseURL:      "http://localhost:55555",
-		Title:        "Shared Bill Splitter API",
+		Title:        "Split It API",
 		Version:      "0.2.0",
 	}
 }

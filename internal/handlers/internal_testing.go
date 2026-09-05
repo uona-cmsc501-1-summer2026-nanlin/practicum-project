@@ -10,6 +10,7 @@ import (
 type TruncateResponse struct {
 	Charges int64 `json:"charges"`
 	People  int64 `json:"people"`
+	Members int64 `json:"members"`
 	Groups  int64 `json:"groups"`
 }
 
@@ -34,17 +35,21 @@ func (a *API) TruncateCharges(c *fiber.Ctx) error {
 	return respondOK(c, TruncateResponse{Charges: n})
 }
 
-// TruncatePeople removes every person row. Internal testing only.
+// TruncatePeople removes every user and membership row. Internal testing only.
 func (a *API) TruncatePeople(c *fiber.Ctx) error {
-	n, err := a.deleteAll(&models.Person{})
+	members, err := a.deleteAll(&models.GroupMember{})
+	if err != nil {
+		return errInternal("could not truncate members")
+	}
+	people, err := a.deleteAll(&models.User{})
 	if err != nil {
 		return errInternal("could not truncate people")
 	}
-	a.resetAutoIncrement("people")
-	return respondOK(c, TruncateResponse{People: n})
+	a.resetAutoIncrement("users", "group_members")
+	return respondOK(c, TruncateResponse{People: people, Members: members})
 }
 
-// TruncateGroups removes all groups and their people and charges. Internal testing only.
+// TruncateGroups removes all groups, members, and charges. Internal testing only.
 func (a *API) TruncateGroups(c *fiber.Ctx) error {
 	out, err := a.truncateAllData()
 	if err != nil {
@@ -53,7 +58,7 @@ func (a *API) TruncateGroups(c *fiber.Ctx) error {
 	return respondOK(c, out)
 }
 
-// TruncateAll removes every charge, person, and group. Internal testing only.
+// TruncateAll removes every charge, membership, user, and group. Internal testing only.
 func (a *API) TruncateAll(c *fiber.Ctx) error {
 	out, err := a.truncateAllData()
 	if err != nil {
@@ -67,7 +72,11 @@ func (a *API) truncateAllData() (TruncateResponse, error) {
 	if err != nil {
 		return TruncateResponse{}, err
 	}
-	people, err := a.deleteAll(&models.Person{})
+	members, err := a.deleteAll(&models.GroupMember{})
+	if err != nil {
+		return TruncateResponse{}, err
+	}
+	people, err := a.deleteAll(&models.User{})
 	if err != nil {
 		return TruncateResponse{}, err
 	}
@@ -75,6 +84,6 @@ func (a *API) truncateAllData() (TruncateResponse, error) {
 	if err != nil {
 		return TruncateResponse{}, err
 	}
-	a.resetAutoIncrement("charges", "people", "groups")
-	return TruncateResponse{Charges: charges, People: people, Groups: groups}, nil
+	a.resetAutoIncrement("charges", "group_members", "users", "groups")
+	return TruncateResponse{Charges: charges, People: people, Members: members, Groups: groups}, nil
 }

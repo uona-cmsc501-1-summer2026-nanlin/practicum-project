@@ -18,6 +18,34 @@ get:
                     $ref: ../../components/schemas/group.yaml
     "404":
       $ref: ../../components/responses/error.yaml
+put:
+  tags: [Groups]
+  summary: Update group name and currency
+  operationId: updateGroup
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/update_group_request.yaml
+  responses:
+    "200":
+      description: Group updated
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    $ref: ../../components/schemas/group.yaml
+    "400":
+      $ref: ../../components/responses/error.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml
 delete:
   tags: [Groups]
   summary: Delete group

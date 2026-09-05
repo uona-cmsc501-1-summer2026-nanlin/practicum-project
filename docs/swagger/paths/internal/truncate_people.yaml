@@ -2,9 +2,9 @@ delete:
   tags: [Internal (testing)]
   summary: Truncate all people
   description: >
-    **Internal testing only — not for production.** Deletes every row in `people`
-    and resets the table auto-increment counter. Charges may reference missing
-    person IDs afterward. Will be removed in a future release.
+    **Internal testing only — not for production.** Deletes every row in `users`
+    and `group_members`, then resets auto-increment counters. Will be removed
+    in a future release.
   operationId: truncatePeople
   deprecated: true
   responses:

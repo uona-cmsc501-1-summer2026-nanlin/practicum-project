@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  version: 0.2.0
-  title: Shared Bill Splitter API
+  version: 0.3.0
+  title: Split It API
   description: >
     REST API for splitting shared expenses. See docs/swagger/markdown/app_description.md
     for workflow details.
@@ -11,7 +11,9 @@ tags:
   - name: Groups
     description: Bill-split sessions
   - name: People
-    description: Members in a group
+    description: Global people (reusable across groups)
+  - name: Members
+    description: Group membership
   - name: Charges
     description: Shared expenses
   - name: Settle
@@ -25,14 +27,20 @@ servers:
 paths:
   /health:
     $ref: ./paths/general/health.yaml
+  /api/v1/currencies:
+    $ref: ./paths/general/currencies.yaml
   /api/v1/groups:
     $ref: ./paths/groups/groups.yaml
   /api/v1/groups/{groupId}:
     $ref: ./paths/groups/group_by_id.yaml
-  /api/v1/groups/{groupId}/people:
+  /api/v1/people:
     $ref: ./paths/people/people.yaml
-  /api/v1/groups/{groupId}/people/{personId}:
+  /api/v1/people/{id}:
     $ref: ./paths/people/person_by_id.yaml
+  /api/v1/groups/{groupId}/members:
+    $ref: ./paths/members/members.yaml
+  /api/v1/groups/{groupId}/members/{userId}:
+    $ref: ./paths/members/member_by_id.yaml
   /api/v1/groups/{groupId}/charges:
     $ref: ./paths/charges/charges.yaml
   /api/v1/groups/{groupId}/charges/{chargeId}:

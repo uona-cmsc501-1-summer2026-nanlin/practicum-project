@@ -1,12 +1,12 @@
 title: TransferRow
 type: object
 properties:
-  fromPersonId:
+  fromUserId:
     type: integer
     format: int64
   fromName:
     type: string
-  toPersonId:
+  toUserId:
     type: integer
     format: int64
   toName:

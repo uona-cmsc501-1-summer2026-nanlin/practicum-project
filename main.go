@@ -25,7 +25,7 @@ func main() {
 	}
 
 	app := fiber.New(fiber.Config{
-		AppName:      "Shared Bill Splitter API",
+		AppName:      "Split It API",
 		ErrorHandler: reply.FiberErrorHandler(),
 	})
 	app.Use(logger.New())
@@ -43,6 +43,11 @@ func main() {
 	api := &handlers.API{DB: db}
 	api.Register(app)
 
+	app.Static("/app", "./web")
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Redirect("/app/", fiber.StatusFound)
+	})
+
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return reply.NewFiber(c).JSON(reply.NewData(fiber.Map{"status": "ok"}))
 	})
@@ -52,6 +57,7 @@ func main() {
 		addr = ":55555"
 	}
 	log.Printf("listening on http://localhost%s (HTTP only, MVP)", addr)
+	log.Printf("app UI:     http://localhost%s/app/", addr)
 	log.Printf("swagger UI: http://localhost%s/swagger", addr)
 	log.Fatal(app.Listen(addr))
 }

@@ -1,6 +1,6 @@
 # Swagger / OpenAPI
 
-Multi-file OpenAPI spec for the Shared Bill Splitter API (pattern similar to elevation-package-validation-service).
+Multi-file OpenAPI spec for the Split It API (pattern similar to elevation-package-validation-service).
 
 ## Layout
 

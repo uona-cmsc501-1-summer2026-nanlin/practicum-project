@@ -1,4 +1,4 @@
-title: CreateGroupRequest
+title: UpdateGroupRequest
 type: object
 required:
   - name

@@ -8,17 +8,17 @@ import (
 
 func TestCompute_equalSplitDinner(t *testing.T) {
 	group := models.Group{ID: 1, Currency: "USD"}
-	people := []models.Person{
+	users := []models.User{
 		{ID: 1, Name: "Alex"},
 		{ID: 2, Name: "Sam"},
 		{ID: 3, Name: "Jordan"},
 	}
 	charges := []models.Charge{
-		{ID: 1, PaidByPersonID: 1, Amount: 90},
+		{ID: 1, PaidByUserID: 1, Amount: 90},
 	}
 	participants := map[uint][]uint{1: {1, 2, 3}}
 
-	result := Compute(group, people, charges, participants)
+	result := Compute(group, users, charges, participants)
 
 	if len(result.Balances) != 3 {
 		t.Fatalf("expected 3 balances, got %d", len(result.Balances))
@@ -36,8 +36,8 @@ func TestCompute_equalSplitDinner(t *testing.T) {
 
 func TestCompute_noCharges(t *testing.T) {
 	group := models.Group{ID: 1, Currency: "USD"}
-	people := []models.Person{{ID: 1, Name: "Alex"}}
-	result := Compute(group, people, nil, nil)
+	users := []models.User{{ID: 1, Name: "Alex"}}
+	result := Compute(group, users, nil, nil)
 
 	if len(result.Balances) != 1 || result.Balances[0].Net != 0 {
 		t.Fatalf("expected zero balance, got %+v", result.Balances)
@@ -49,20 +49,20 @@ func TestCompute_noCharges(t *testing.T) {
 
 func TestCompute_twoCharges(t *testing.T) {
 	group := models.Group{ID: 1, Currency: "USD"}
-	people := []models.Person{
+	users := []models.User{
 		{ID: 1, Name: "Alex"},
 		{ID: 2, Name: "Sam"},
 	}
 	charges := []models.Charge{
-		{ID: 1, PaidByPersonID: 1, Amount: 40},
-		{ID: 2, PaidByPersonID: 2, Amount: 20},
+		{ID: 1, PaidByUserID: 1, Amount: 40},
+		{ID: 2, PaidByUserID: 2, Amount: 20},
 	}
 	participants := map[uint][]uint{
 		1: {1, 2},
 		2: {1, 2},
 	}
 
-	result := Compute(group, people, charges, participants)
+	result := Compute(group, users, charges, participants)
 
 	// Alex paid 40, owes 20+10=30 -> +10; Sam paid 20, owes 20+10=30 -> -10
 	if result.Balances[0].Net != 10 || result.Balances[1].Net != -10 {

@@ -10,6 +10,10 @@ properties:
     type: integer
     format: int64
     example: 0
+  members:
+    type: integer
+    format: int64
+    example: 0
   groups:
     type: integer
     format: int64

@@ -22,31 +22,32 @@ Ship a **simple minimal UI** to manage **people**, **groups**, and **charges**, 
 
 ### Schema
 
-- [ ] Add `users` table (`id`, `name`, `email`) — global identity, no `group_id`
-- [ ] Add `group_members` join table (`group_id`, `user_id`, unique pair)
-- [ ] Migrate `charges` to reference `user_id` (payer + participants) instead of group-scoped person IDs
-- [ ] Drop old `people` table (or migrate existing rows → `users` + `group_members`)
-- [ ] Update [project-2-doc.md](project-2-doc.md) (to-do and database schema sections)
+- [x] Add `users` table (`id`, `name`, `email`) — global identity, no `group_id`
+- [x] Add `group_members` join table (`group_id`, `user_id`, unique pair)
+- [x] Migrate `charges` to reference `user_id` (payer + participants) instead of group-scoped person IDs
+- [x] Drop old `people` table (wipe SQLite DB on upgrade; AutoMigrate creates new tables)
+- [x] Update [deliverable2-doc.md](deliverable2-doc.md) (schema and API sections)
 
 ### API — global people
 
-- [ ] `POST /api/v1/people` — create person
-- [ ] `GET /api/v1/people` — list all people
-- [ ] `GET /api/v1/people/:id` — get one
-- [ ] `DELETE /api/v1/people/:id` — delete (block if still in any group or on charges)
+- [x] `POST /api/v1/people` — create person
+- [x] `GET /api/v1/people` — list all people
+- [x] `GET /api/v1/people/:id` — get one
+- [x] `PUT /api/v1/people/:id` — update name/email
+- [x] `DELETE /api/v1/people/:id` — delete (block if still in any group or on charges)
 
 ### API — group membership
 
-- [ ] `GET /api/v1/groups/:groupId/members` — list members in group
-- [ ] `POST /api/v1/groups/:groupId/members` — add existing person (`{ "userId": 1 }`)
-- [ ] `DELETE /api/v1/groups/:groupId/members/:userId` — remove from group
+- [x] `GET /api/v1/groups/:groupId/members` — list members in group
+- [x] `POST /api/v1/groups/:groupId/members` — add existing person (`{ "userId": 1 }`)
+- [x] `DELETE /api/v1/groups/:groupId/members/:userId` — remove from group
 
 ### API — charges and settle
 
-- [ ] Update charge validation: payer + participants must be **members** of that group
-- [ ] Update settle to resolve names from global `users`
-- [ ] Update Swagger + Postman collection
-- [ ] Update tests (`handlers_test.go`, `settle_test.go`, demo script)
+- [x] Update charge validation: payer + participants must be **members** of that group
+- [x] Update settle to resolve names from global `users`
+- [x] Update Swagger + Postman collection
+- [x] Update tests (`handlers_test.go`, `settle_test.go`)
 
 ---
 
@@ -54,34 +55,34 @@ Ship a **simple minimal UI** to manage **people**, **groups**, and **charges**, 
 
 ### Setup
 
-- [ ] Add `web/` folder — plain HTML + CSS + vanilla JS (or Vite + minimal framework if preferred)
-- [ ] Serve static files from Fiber (`/app` or root) or run UI on a second port with CORS
-- [ ] Small `api.js` helper: `fetch` wrapper pointing at `http://localhost:55555/api/v1`
+- [x] Add `web/` folder — plain HTML + CSS + vanilla JS
+- [x] Serve static files from Fiber at `/app`
+- [x] Small `api.js` helper: `fetch` wrapper to `/api/v1`
 
 ### People screen
 
-- [ ] List all people (name, email)
-- [ ] Form: add person
-- [ ] Delete person (with confirm)
+- [x] List all people (name, email)
+- [x] Form: add person
+- [x] Delete person (with confirm)
 
 ### Groups screen
 
-- [ ] List groups
-- [ ] Form: create group (name, currency)
-- [ ] Click group → group detail view
-- [ ] Delete group
+- [x] List groups
+- [x] Form: create group (name, currency)
+- [x] Click group → group detail view
+- [x] Delete group
 
 ### Group detail screen
 
-- [ ] **Members** — show who is in the group; dropdown to add existing person; remove member
-- [ ] **Charges** — list charges; form: description, amount, payer (dropdown), participants (checkboxes), split rule
-- [ ] **Settle** — button calls `POST .../settle`; show balances + who-pays-whom table
+- [x] **Members** — show who is in the group; dropdown to add existing person; remove member
+- [x] **Charges** — list charges; form: description, amount, payer (dropdown), participants (checkboxes), split rule
+- [x] **Settle** — button calls `POST .../settle`; show balances + who-pays-whom table
 
 ### Polish (still minimal)
 
-- [ ] Basic error messages from API (`400` / `404`)
-- [ ] Empty states (“No people yet”, “No charges”)
-- [ ] Simple nav: **People** | **Groups**
+- [x] Basic error messages from API (`400` / `404`)
+- [x] Empty states (“No people yet”, “No charges”)
+- [x] Simple nav: **People** | **Groups**
 
 ---
 

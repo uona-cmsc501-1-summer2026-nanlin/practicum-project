@@ -7,8 +7,7 @@ properties:
   name:
     type: string
   currency:
-    type: string
-    example: USD
+    $ref: ./currency_code.yaml
   createdAt:
     type: string
     format: date-time

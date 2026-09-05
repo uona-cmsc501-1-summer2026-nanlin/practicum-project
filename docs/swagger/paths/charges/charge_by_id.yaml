@@ -19,6 +19,35 @@ get:
                     $ref: ../../components/schemas/charge.yaml
     "404":
       $ref: ../../components/responses/error.yaml
+put:
+  tags: [Charges]
+  summary: Update charge
+  operationId: updateCharge
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+    - $ref: ../../components/parameters/charge_id.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../components/schemas/update_charge_request.yaml
+  responses:
+    "200":
+      description: Charge updated
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: ../../components/schemas/reply_success.yaml
+              - type: object
+                properties:
+                  data:
+                    $ref: ../../components/schemas/charge.yaml
+    "400":
+      $ref: ../../components/responses/error.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml
 delete:
   tags: [Charges]
   summary: Delete charge

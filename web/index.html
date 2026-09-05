@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Split It</title>
+  <link rel="icon" href="/app/img/icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="/app/css/styles.css" />
+  <script>
+    (function () {
+      var t = localStorage.getItem("billsplitter.theme") || "forest";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <img class="brand-icon" src="/app/img/icon.svg" alt="" width="36" height="36" />
+      <span>Split It</span>
+    </div>
+    <div class="top-actions">
+      <button type="button" id="btn-theme" class="icon-btn" title="Color theme" aria-label="Switch color theme">
+        <i class="fa-solid fa-palette" aria-hidden="true"></i>
+      </button>
+      <button type="button" id="btn-categories" class="icon-btn" title="Categories" aria-label="Categories">
+        <i class="fa-solid fa-tags" aria-hidden="true"></i>
+      </button>
+      <button type="button" id="btn-people" class="icon-btn" title="People" aria-label="People">
+        <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <main id="app" class="workspace"></main>
+
+  <div id="modal-root"></div>
+  <div id="confirm-root"></div>
+  <p id="flash" class="flash" hidden></p>
+
+  <script src="/app/js/api.js"></script>
+  <script src="/app/js/app.js"></script>
+</body>
+</html>

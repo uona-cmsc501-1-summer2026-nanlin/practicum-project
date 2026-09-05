@@ -7,13 +7,12 @@ import (
 func TestTruncateAll_clearsData(t *testing.T) {
 	app := testApp(t)
 
-	doJSON(t, app, "POST", "/api/v1/groups", map[string]string{"name": "Trip"})
-	doJSON(t, app, "POST", "/api/v1/groups/1/people", map[string]string{"name": "Alex"})
-	doJSON(t, app, "POST", "/api/v1/groups/1/charges", map[string]any{
+	groupID, id1, _, _ := seedTripWithMembers(t, app)
+	doJSON(t, app, "POST", "/api/v1/groups/"+gid(groupID)+"/charges", map[string]any{
 		"description":    "Dinner",
 		"amount":         30.0,
-		"paidByPersonId": 1,
-		"participantIds": []int{1},
+		"paidByUserId":   id1,
+		"participantIds": []int{int(id1)},
 	})
 
 	code, body := doJSON(t, app, "DELETE", "/api/v1/internal/testing/truncate/all", nil)
@@ -24,8 +23,11 @@ func TestTruncateAll_clearsData(t *testing.T) {
 	if data["groups"].(float64) != 1 {
 		t.Fatalf("expected 1 group deleted, got %v", data)
 	}
-	if data["people"].(float64) != 1 {
-		t.Fatalf("expected 1 person deleted, got %v", data)
+	if data["people"].(float64) != 3 {
+		t.Fatalf("expected 3 people deleted, got %v", data)
+	}
+	if data["members"].(float64) != 3 {
+		t.Fatalf("expected 3 members deleted, got %v", data)
 	}
 	if data["charges"].(float64) != 1 {
 		t.Fatalf("expected 1 charge deleted, got %v", data)
@@ -44,13 +46,12 @@ func TestTruncateAll_clearsData(t *testing.T) {
 func TestTruncateCharges_onlyCharges(t *testing.T) {
 	app := testApp(t)
 
-	doJSON(t, app, "POST", "/api/v1/groups", map[string]string{"name": "Trip"})
-	doJSON(t, app, "POST", "/api/v1/groups/1/people", map[string]string{"name": "Alex"})
-	doJSON(t, app, "POST", "/api/v1/groups/1/charges", map[string]any{
+	groupID, id1, _, _ := seedTripWithMembers(t, app)
+	doJSON(t, app, "POST", "/api/v1/groups/"+gid(groupID)+"/charges", map[string]any{
 		"description":    "Dinner",
 		"amount":         30.0,
-		"paidByPersonId": 1,
-		"participantIds": []int{1},
+		"paidByUserId":   id1,
+		"participantIds": []int{int(id1)},
 	})
 
 	code, body := doJSON(t, app, "DELETE", "/api/v1/internal/testing/truncate/charges", nil)
@@ -65,12 +66,21 @@ func TestTruncateCharges_onlyCharges(t *testing.T) {
 		t.Fatalf("expected only charges deleted, got %v", data)
 	}
 
-	code, list := doJSON(t, app, "GET", "/api/v1/groups/1/people", nil)
+	code, list := doJSON(t, app, "GET", "/api/v1/people", nil)
 	if code != 200 {
 		t.Fatalf("list people: status=%d", code)
 	}
 	people, _ := list["data"].([]any)
-	if len(people) != 1 {
+	if len(people) != 3 {
 		t.Fatalf("expected people to remain, got %v", people)
+	}
+
+	code, members := doJSON(t, app, "GET", "/api/v1/groups/"+gid(groupID)+"/members", nil)
+	if code != 200 {
+		t.Fatalf("list members: status=%d", code)
+	}
+	memberList, _ := members["data"].([]any)
+	if len(memberList) != 3 {
+		t.Fatalf("expected members to remain, got %v", memberList)
 	}
 }

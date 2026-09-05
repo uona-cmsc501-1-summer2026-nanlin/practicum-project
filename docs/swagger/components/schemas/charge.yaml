@@ -12,7 +12,7 @@ properties:
   amount:
     type: number
     format: double
-  paidByPersonId:
+  paidByUserId:
     type: integer
     format: int64
   participantIds:

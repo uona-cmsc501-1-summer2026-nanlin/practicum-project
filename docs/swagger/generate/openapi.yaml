@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  version: 0.2.0
-  title: Shared Bill Splitter API
+  version: 0.3.0
+  title: Split It API
   description: |
     REST API for splitting shared expenses. See docs/swagger/markdown/app_description.md for workflow details.
 servers:
@@ -12,7 +12,9 @@ tags:
   - name: Groups
     description: Bill-split sessions
   - name: People
-    description: Members in a group
+    description: Global people (reusable across groups)
+  - name: Members
+    description: Group membership
   - name: Charges
     description: Shared expenses
   - name: Settle
@@ -43,6 +45,26 @@ paths:
                           status:
                             type: string
                             example: ok
+  /api/v1/currencies:
+    get:
+      tags:
+        - General
+      summary: List allowed currencies
+      operationId: listCurrencies
+      responses:
+        '200':
+          description: Currency options (code, name, flag)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/currency_option'
   /api/v1/groups:
     post:
       tags:
@@ -117,6 +139,35 @@ paths:
                         $ref: '#/components/schemas/group'
         '404':
           $ref: '#/components/responses/error'
+    put:
+      tags:
+        - Groups
+      summary: Update group name and currency
+      operationId: updateGroup
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update_group_request'
+      responses:
+        '200':
+          description: Group updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/group'
+        '400':
+          $ref: '#/components/responses/error'
+        '404':
+          $ref: '#/components/responses/error'
     delete:
       tags:
         - Groups
@@ -129,14 +180,12 @@ paths:
           description: Group deleted
         '404':
           $ref: '#/components/responses/error'
-  /api/v1/groups/{groupId}/people:
+  /api/v1/people:
     post:
       tags:
         - People
-      summary: Add person to group
+      summary: Create a global person
       operationId: createPerson
-      parameters:
-        - $ref: '#/components/parameters/group_id'
       requestBody:
         required: true
         content:
@@ -159,15 +208,12 @@ paths:
                         $ref: '#/components/schemas/person'
         '400':
           $ref: '#/components/responses/error'
-        '404':
-          $ref: '#/components/responses/error'
     get:
       tags:
         - People
-      summary: List people in group
+      summary: List all people
       operationId: listPeople
       parameters:
-        - $ref: '#/components/parameters/group_id'
         - name: name
           in: query
           schema:
@@ -186,16 +232,13 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/person'
-        '404':
-          $ref: '#/components/responses/error'
-  /api/v1/groups/{groupId}/people/{personId}:
+  /api/v1/people/{id}:
     get:
       tags:
         - People
       summary: Get person by id
       operationId: getPerson
       parameters:
-        - $ref: '#/components/parameters/group_id'
         - $ref: '#/components/parameters/person_id'
       responses:
         '200':
@@ -211,17 +254,117 @@ paths:
                         $ref: '#/components/schemas/person'
         '404':
           $ref: '#/components/responses/error'
+    put:
+      tags:
+        - People
+      summary: Update person
+      operationId: updatePerson
+      parameters:
+        - $ref: '#/components/parameters/person_id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update_person_request'
+      responses:
+        '200':
+          description: Person updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/person'
+        '400':
+          $ref: '#/components/responses/error'
+        '404':
+          $ref: '#/components/responses/error'
     delete:
       tags:
         - People
       summary: Delete person
+      description: Blocked if the person is still in any group or referenced by a charge.
       operationId: deletePerson
       parameters:
-        - $ref: '#/components/parameters/group_id'
         - $ref: '#/components/parameters/person_id'
       responses:
         '204':
           description: Person deleted
+        '400':
+          $ref: '#/components/responses/error'
+        '404':
+          $ref: '#/components/responses/error'
+  /api/v1/groups/{groupId}/members:
+    post:
+      tags:
+        - Members
+      summary: Add existing person to group
+      operationId: addMember
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/add_member_request'
+      responses:
+        '201':
+          description: Member added
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      code:
+                        example: 201
+                      data:
+                        $ref: '#/components/schemas/person'
+        '400':
+          $ref: '#/components/responses/error'
+        '404':
+          $ref: '#/components/responses/error'
+    get:
+      tags:
+        - Members
+      summary: List members in group
+      operationId: listMembers
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+      responses:
+        '200':
+          description: Members list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/person'
+        '404':
+          $ref: '#/components/responses/error'
+  /api/v1/groups/{groupId}/members/{userId}:
+    delete:
+      tags:
+        - Members
+      summary: Remove member from group
+      operationId: removeMember
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+        - $ref: '#/components/parameters/user_id'
+      responses:
+        '204':
+          description: Member removed
         '404':
           $ref: '#/components/responses/error'
   /api/v1/groups/{groupId}/charges:
@@ -318,6 +461,36 @@ paths:
                         $ref: '#/components/schemas/charge'
         '404':
           $ref: '#/components/responses/error'
+    put:
+      tags:
+        - Charges
+      summary: Update charge
+      operationId: updateCharge
+      parameters:
+        - $ref: '#/components/parameters/group_id'
+        - $ref: '#/components/parameters/charge_id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update_charge_request'
+      responses:
+        '200':
+          description: Charge updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/reply_success'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/charge'
+        '400':
+          $ref: '#/components/responses/error'
+        '404':
+          $ref: '#/components/responses/error'
     delete:
       tags:
         - Charges
@@ -388,7 +561,7 @@ paths:
         - Internal (testing)
       summary: Truncate all people
       description: |
-        **Internal testing only — not for production.** Deletes every row in `people` and resets the table auto-increment counter. Charges may reference missing person IDs afterward. Will be removed in a future release.
+        **Internal testing only — not for production.** Deletes every row in `users` and `group_members`, then resets auto-increment counters. Will be removed in a future release.
       operationId: truncatePeople
       deprecated: true
       responses:
@@ -411,7 +584,7 @@ paths:
         - Internal (testing)
       summary: Truncate all groups (and related data)
       description: |
-        **Internal testing only — not for production.** Deletes all charges, people, and groups, then resets auto-increment counters. Same effect as truncate-all for the current schema. Will be removed in a future release.
+        **Internal testing only — not for production.** Deletes all charges, members, people (users), and groups, then resets auto-increment counters. Same effect as truncate-all for the current schema. Will be removed in a future release.
       operationId: truncateGroups
       deprecated: true
       responses:
@@ -479,6 +652,38 @@ components:
         data:
           type: object
           description: Endpoint-specific payload
+    currency_code:
+      title: CurrencyCode
+      type: string
+      description: ISO 4217 currency code accepted by the API.
+      default: USD
+      enum:
+        - USD
+        - EUR
+        - GBP
+        - CAD
+        - AUD
+        - JPY
+        - CNY
+        - CHF
+        - INR
+        - MXN
+        - BRL
+        - KRW
+      example: USD
+    currency_option:
+      title: CurrencyOption
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/currency_code'
+        name:
+          type: string
+          example: US Dollar
+        country:
+          type: string
+          description: ISO 3166-1 alpha-2 country/region code used for flag images (eu for Euro).
+          example: us
     group:
       title: Group
       type: object
@@ -489,8 +694,7 @@ components:
         name:
           type: string
         currency:
-          type: string
-          example: USD
+          $ref: '#/components/schemas/currency_code'
         createdAt:
           type: string
           format: date-time
@@ -503,8 +707,7 @@ components:
         name:
           type: string
         currency:
-          type: string
-          default: USD
+          $ref: '#/components/schemas/currency_code'
     reply_error:
       title: ReplyErrorEnvelope
       type: object
@@ -527,14 +730,21 @@ components:
         message:
           type: string
           example: validation failed
+    update_group_request:
+      title: UpdateGroupRequest
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        currency:
+          $ref: '#/components/schemas/currency_code'
     person:
       title: Person
       type: object
       properties:
         id:
-          type: integer
-          format: int64
-        groupId:
           type: integer
           format: int64
         name:
@@ -551,6 +761,25 @@ components:
           type: string
         email:
           type: string
+    update_person_request:
+      title: UpdatePersonRequest
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+    add_member_request:
+      title: AddMemberRequest
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: integer
+          format: int64
     charge:
       title: ChargeResponse
       type: object
@@ -566,7 +795,7 @@ components:
         amount:
           type: number
           format: double
-        paidByPersonId:
+        paidByUserId:
           type: integer
           format: int64
         participantIds:
@@ -586,7 +815,7 @@ components:
       required:
         - description
         - amount
-        - paidByPersonId
+        - paidByUserId
       properties:
         description:
           type: string
@@ -594,7 +823,33 @@ components:
           type: number
           format: double
           minimum: 0.01
-        paidByPersonId:
+        paidByUserId:
+          type: integer
+          format: int64
+        participantIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        splitRule:
+          type: string
+          default: equal
+    update_charge_request:
+      title: UpdateChargeRequest
+      type: object
+      required:
+        - description
+        - amount
+        - paidByUserId
+        - participantIds
+      properties:
+        description:
+          type: string
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+        paidByUserId:
           type: integer
           format: int64
         participantIds:
@@ -618,7 +873,7 @@ components:
       title: BalanceRow
       type: object
       properties:
-        personId:
+        userId:
           type: integer
           format: int64
         name:
@@ -630,12 +885,12 @@ components:
       title: TransferRow
       type: object
       properties:
-        fromPersonId:
+        fromUserId:
           type: integer
           format: int64
         fromName:
           type: string
-        toPersonId:
+        toUserId:
           type: integer
           format: int64
         toName:
@@ -651,7 +906,7 @@ components:
           type: integer
           format: int64
         currency:
-          type: string
+          $ref: '#/components/schemas/currency_code'
         balances:
           type: array
           items:
@@ -670,6 +925,10 @@ components:
           format: int64
           example: 3
         people:
+          type: integer
+          format: int64
+          example: 0
+        members:
           type: integer
           format: int64
           example: 0
@@ -693,7 +952,14 @@ components:
         type: integer
         format: int64
     person_id:
-      name: personId
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    user_id:
+      name: userId
       in: path
       required: true
       schema:

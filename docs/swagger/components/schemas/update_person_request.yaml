@@ -1,9 +1,8 @@
-title: Person
+title: UpdatePersonRequest
 type: object
+required:
+  - name
 properties:
-  id:
-    type: integer
-    format: int64
   name:
     type: string
   email:

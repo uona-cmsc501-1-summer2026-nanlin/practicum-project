@@ -1,0 +1,12 @@
+delete:
+  tags: [Members]
+  summary: Remove member from group
+  operationId: removeMember
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
+    - $ref: ../../components/parameters/user_id.yaml
+  responses:
+    "204":
+      description: Member removed
+    "404":
+      $ref: ../../components/responses/error.yaml

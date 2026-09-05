@@ -9,14 +9,14 @@ import (
 
 const epsilon = 0.005
 
-// Compute builds net balances and simplified transfers from people and charges.
+// Compute builds net balances and simplified transfers from users and charges.
 // Each charge: payer gets +amount; each participant owes amount/n (equal split).
-func Compute(group models.Group, people []models.Person, charges []models.Charge, participantMap map[uint][]uint) models.SettleResponse {
-	balance := make(map[uint]float64, len(people))
-	names := make(map[uint]string, len(people))
-	for _, p := range people {
-		balance[p.ID] = 0
-		names[p.ID] = p.Name
+func Compute(group models.Group, users []models.User, charges []models.Charge, participantMap map[uint][]uint) models.SettleResponse {
+	balance := make(map[uint]float64, len(users))
+	names := make(map[uint]string, len(users))
+	for _, u := range users {
+		balance[u.ID] = 0
+		names[u.ID] = u.Name
 	}
 
 	for _, c := range charges {
@@ -24,23 +24,23 @@ func Compute(group models.Group, people []models.Person, charges []models.Charge
 		if len(ids) == 0 {
 			continue
 		}
-		balance[c.PaidByPersonID] += c.Amount
+		balance[c.PaidByUserID] += c.Amount
 		share := c.Amount / float64(len(ids))
-		for _, pid := range ids {
-			balance[pid] -= share
+		for _, uid := range ids {
+			balance[uid] -= share
 		}
 	}
 
-	balances := make([]models.BalanceRow, 0, len(people))
-	for _, p := range people {
-		net := round2(balance[p.ID])
+	balances := make([]models.BalanceRow, 0, len(users))
+	for _, u := range users {
+		net := round2(balance[u.ID])
 		balances = append(balances, models.BalanceRow{
-			PersonID: p.ID,
-			Name:     p.Name,
-			Net:      net,
+			UserID: u.ID,
+			Name:   u.Name,
+			Net:    net,
 		})
 	}
-	sort.Slice(balances, func(i, j int) bool { return balances[i].PersonID < balances[j].PersonID })
+	sort.Slice(balances, func(i, j int) bool { return balances[i].UserID < balances[j].UserID })
 
 	type party struct {
 		id  uint
@@ -65,11 +65,11 @@ func Compute(group models.Group, people []models.Person, charges []models.Charge
 		pay = round2(pay)
 		if pay > epsilon {
 			transfers = append(transfers, models.TransferRow{
-				FromPersonID: debtors[i].id,
-				FromName:     names[debtors[i].id],
-				ToPersonID:   creditors[j].id,
-				ToName:       names[creditors[j].id],
-				Amount:       pay,
+				FromUserID: debtors[i].id,
+				FromName:   names[debtors[i].id],
+				ToUserID:   creditors[j].id,
+				ToName:     names[creditors[j].id],
+				Amount:     pay,
 			})
 		}
 		debtors[i].amt = round2(debtors[i].amt - pay)
@@ -83,10 +83,12 @@ func Compute(group models.Group, people []models.Person, charges []models.Charge
 	}
 
 	return models.SettleResponse{
-		GroupID:   group.ID,
-		Currency:  group.Currency,
-		Balances:  balances,
-		Transfers: transfers,
+		GroupID:           group.ID,
+		Currency:          group.Currency,
+		Balances:          balances,
+		Transfers:         transfers,
+		CategoryBreakdown: []models.CategorySpendRow{},
+		SpendOverTime:     []models.SpendDayRow{},
 	}
 }
 

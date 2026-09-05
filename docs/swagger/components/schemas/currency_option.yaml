@@ -1,0 +1,12 @@
+title: CurrencyOption
+type: object
+properties:
+  code:
+    $ref: ./currency_code.yaml
+  name:
+    type: string
+    example: US Dollar
+  country:
+    type: string
+    description: ISO 3166-1 alpha-2 country/region code used for flag images (eu for Euro).
+    example: us

@@ -1,16 +1,18 @@
 post:
-  tags: [People]
-  summary: Create a global person
-  operationId: createPerson
+  tags: [Members]
+  summary: Add existing person to group
+  operationId: addMember
+  parameters:
+    - $ref: ../../components/parameters/group_id.yaml
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          $ref: ../../components/schemas/create_person_request.yaml
+          $ref: ../../components/schemas/add_member_request.yaml
   responses:
     "201":
-      description: Person created
+      description: Member added
       content:
         application/json:
           schema:
@@ -24,18 +26,17 @@ post:
                     $ref: ../../components/schemas/person.yaml
     "400":
       $ref: ../../components/responses/error.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml
 get:
-  tags: [People]
-  summary: List all people
-  operationId: listPeople
+  tags: [Members]
+  summary: List members in group
+  operationId: listMembers
   parameters:
-    - name: name
-      in: query
-      schema:
-        type: string
+    - $ref: ../../components/parameters/group_id.yaml
   responses:
     "200":
-      description: People list
+      description: Members list
       content:
         application/json:
           schema:
@@ -47,3 +48,5 @@ get:
                     type: array
                     items:
                       $ref: ../../components/schemas/person.yaml
+    "404":
+      $ref: ../../components/responses/error.yaml

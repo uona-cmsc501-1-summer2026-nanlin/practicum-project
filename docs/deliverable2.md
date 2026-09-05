@@ -55,7 +55,7 @@ flowchart TD
 
 ### REST API input / output flow
 
-See [project-2-doc.md](project-2-doc.md) for dependencies, Swagger URLs, sequence diagrams, database schema, and the demo sequence.
+See [deliverable2-doc.md](deliverable2-doc.md) for dependencies, Swagger URLs, sequence diagrams, database schema, and the demo sequence. Final deliverable (global people + UI): [deliverable3.md](deliverable3.md).
 
 ### What each package / type is designed to do
 

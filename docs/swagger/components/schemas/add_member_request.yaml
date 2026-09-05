@@ -1,0 +1,8 @@
+title: AddMemberRequest
+type: object
+required:
+  - userId
+properties:
+  userId:
+    type: integer
+    format: int64

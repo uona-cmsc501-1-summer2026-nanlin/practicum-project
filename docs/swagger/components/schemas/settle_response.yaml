@@ -5,7 +5,7 @@ properties:
     type: integer
     format: int64
   currency:
-    type: string
+    $ref: ./currency_code.yaml
   balances:
     type: array
     items:

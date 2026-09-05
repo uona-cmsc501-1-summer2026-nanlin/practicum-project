@@ -1,0 +1,18 @@
+title: CurrencyCode
+type: string
+description: ISO 4217 currency code accepted by the API.
+default: USD
+enum:
+  - USD
+  - EUR
+  - GBP
+  - CAD
+  - AUD
+  - JPY
+  - CNY
+  - CHF
+  - INR
+  - MXN
+  - BRL
+  - KRW
+example: USD

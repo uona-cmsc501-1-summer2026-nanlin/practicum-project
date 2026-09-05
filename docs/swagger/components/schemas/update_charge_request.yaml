@@ -1,9 +1,10 @@
-title: CreateChargeRequest
+title: UpdateChargeRequest
 type: object
 required:
   - description
   - amount
   - paidByUserId
+  - participantIds
 properties:
   description:
     type: string

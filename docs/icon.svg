@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="paper" x1="180" y1="120" x2="350" y2="390" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E9EEFA"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="350" y1="315" x2="425" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE56B"/>
+      <stop offset="1" stop-color="#F6A623"/>
+    </linearGradient>
+    <linearGradient id="green" x1="216" y1="55" x2="290" y2="135" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9AF3D0"/>
+      <stop offset="1" stop-color="#20C997"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="70" y1="220" x2="150" y2="310" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8BCBFF"/>
+      <stop offset="1" stop-color="#2878E8"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="370" y1="220" x2="450" y2="310" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D0A2FF"/>
+      <stop offset="1" stop-color="#8050E8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top friend -->
+  <circle cx="256" cy="82" r="38" fill="#102A5C"/>
+  <circle cx="256" cy="78" r="25" fill="url(#green)"/>
+  <path d="M205 142c5-30 26-45 51-45s46 15 51 45c1 8-5 14-13 14H218c-8 0-14-6-13-14Z"
+        fill="#102A5C"/>
+  <path d="M222 137c5-17 17-26 34-26s29 9 34 26h-68Z" fill="url(#green)"/>
+
+  <!-- Left friend -->
+  <circle cx="112" cy="255" r="38" fill="#102A5C"/>
+  <circle cx="112" cy="251" r="25" fill="url(#blue)"/>
+  <path d="M61 315c5-30 26-45 51-45s46 15 51 45c1 8-5 14-13 14H74c-8 0-14-6-13-14Z"
+        fill="#102A5C"/>
+  <path d="M78 310c5-17 17-26 34-26s29 9 34 26H78Z" fill="url(#blue)"/>
+
+  <!-- Right friend -->
+  <circle cx="400" cy="255" r="38" fill="#102A5C"/>
+  <circle cx="400" cy="251" r="25" fill="url(#purple)"/>
+  <path d="M349 315c5-30 26-45 51-45s46 15 51 45c1 8-5 14-13 14h-76c-8 0-14-6-13-14Z"
+        fill="#102A5C"/>
+  <path d="M366 310c5-17 17-26 34-26s29 9 34 26h-68Z" fill="url(#purple)"/>
+
+  <!-- Sharing arcs -->
+  <path d="M151 190c17-25 38-39 64-46" stroke="#27CDA2" stroke-width="14" stroke-linecap="round"/>
+  <path d="M361 144c26 8 47 23 64 47" stroke="#8A5CF0" stroke-width="14" stroke-linecap="round"/>
+  <path d="M153 347c16 20 36 31 57 36" stroke="#347FEA" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- Receipt -->
+  <path d="M178 170
+           C178 159 187 150 198 150
+           H333
+           C344 150 353 159 353 170
+           V348
+           L337 366 L321 350 L305 368 L289 351 L273 369 L257 351
+           L241 368 L225 350 L209 367 L193 349 L178 363 Z"
+        fill="#102A5C"/>
+  <path d="M192 170
+           C192 167 195 164 198 164
+           H333
+           C336 164 339 167 339 170
+           V340
+           L337 343 L321 327 L305 345 L289 328 L273 346 L257 328
+           L241 345 L225 327 L209 344 L192 327 Z"
+        fill="url(#paper)"/>
+
+  <!-- Dollar mark -->
+  <path d="M266 190v62M284 202c-7-8-19-10-28-4-10 7-8 19 3 23l19 7c12 4 14 17 4 25-10 8-25 5-32-4"
+        stroke="#102A5C" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Receipt lines -->
+  <path d="M215 274h101M215 294h70M215 314h85" stroke="#6C82A8" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- Coin -->
+  <circle cx="365" cy="370" r="61" fill="#102A5C"/>
+  <circle cx="365" cy="365" r="52" fill="url(#coin)"/>
+  <circle cx="365" cy="365" r="39" stroke="#E99A18" stroke-width="5"/>
+  <path d="M365 334v61M383 345c-6-7-16-9-24-4-9 6-7 16 3 20l16 6c10 3 12 14 3 21-9 7-21 4-27-4"
+        stroke="#B85C11" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Small sparkle -->
+  <path d="M431 330l10-15M444 350l18-6M425 315l4-17"
+        stroke="#F6B82E" stroke-width="8" stroke-linecap="round"/>
+</svg>
