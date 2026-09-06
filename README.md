@@ -8,12 +8,31 @@ Coursework repository for **CMSC501-1 Structure of Programming Language — Summ
 
 https://github.com/uona-cmsc501-1-summer2026-nanlin/practicum-project
 
-## Run
+## How to run
 
-```bash
-go run .
-# or: make run
-```
+1. **Install Go** (this project expects **Go 1.26+**, matching `go.mod`)
+   - Download the installer for your OS from https://go.dev/dl/
+   - Run it, then open a **new** terminal and check:
+
+   ```bash
+   go version
+   ```
+
+2. **Clone the repo** (skip if you already have it)
+
+   ```bash
+   git clone https://github.com/uona-cmsc501-1-summer2026-nanlin/practicum-project.git
+   cd practicum-project
+   ```
+
+3. **Start the server** (first run downloads modules automatically)
+
+   ```bash
+   go run .
+   # or: make run
+   ```
+
+4. **Open the app** in a browser
 
 | Resource | URL |
 |----------|-----|
@@ -21,6 +40,8 @@ go run .
 | **API** | http://localhost:55555/api/v1 |
 | **Health** | http://localhost:55555/health |
 | **Swagger** | http://localhost:55555/swagger |
+
+Optional: set `ADDR` (listen address, default `:55555`) or `DB_PATH` (SQLite file, default `billsplitter.db`).
 
 ### Upgrading from Deliverable #2
 
